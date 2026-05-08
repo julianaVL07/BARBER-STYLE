@@ -1,0 +1,203 @@
+/* ══════════════════════════════════════════════
+   BARBER STYLE — Estilos principales
+   Inspirado en estética editorial dark & clean
+   Paleta: Negro profundo + Blanco + Crema cálida
+   Fuentes: Cormorant Garamond (display) + Jost (body)
+══════════════════════════════════════════════ */
+
+/* Importación de fuentes desde Google Fonts:
+   - Cormorant Garamond: fuente serif elegante usada en títulos y la marca
+   - Jost: fuente sans-serif moderna usada en el cuerpo del texto y botones */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
+
+/* ── VARIABLES GLOBALES (Design Tokens) ──
+   Definen la paleta de colores, bordes, sombras y radios
+   que se reutilizan en todo el archivo para mantener coherencia visual */
+:root {
+  --black:       #111111;        /* Negro principal para fondos oscuros y texto destacado */
+  --dark:        #1C1C1C;        /* Negro suavizado para texto general */
+  --charcoal:    #2A2A2A;        /* Gris muy oscuro para hover en botones primarios */
+  --mid:         #555555;        /* Gris medio para textos secundarios */
+  --muted:       #888888;        /* Gris apagado para textos terciarios (descripciones, placeholders) */
+  --light:       #CCCCCC;        /* Gris claro para texto desactivado */
+  --cream:       #F5F0E8;        /* Crema base para fondos cálidos */
+  --warm-white:  #FAF8F5;        /* Blanco cálido: color de fondo del body */
+  --white:       #FFFFFF;        /* Blanco puro para textos sobre fondos oscuros */
+  --accent:      #C8A96E;        /* Dorado: color de acento principal (navbar activo, toast, etc.) */
+  --crema:       #f2dfb4;        /* Crema dorada para fondos de tarjetas */
+  --crema-claro: #fbedcd;        /* Crema muy clara para inputs y elementos interactivos */
+  --accent-dark: #A8894E;        /* Dorado oscuro: hover de elementos con acento */
+  --danger:      #C0392B;        /* Rojo para errores, mensajes de validación y botón eliminar */
+  --success:     #27AE60;        /* Verde para mensajes de éxito (disponible para uso futuro) */
+  --border:      #E0D8CC;        /* Color de bordes suaves en tarjetas e inputs */
+  --border-dark: #333333;        /* Color de borde oscuro usado en la navbar */
+  --radius:      4px;            /* Radio de borde estándar para inputs y botones */
+  --radius-lg:   8px;            /* Radio de borde grande para tarjetas y modales */
+  --shadow:      0 2px 24px rgba(0,0,0,0.08);   /* Sombra suave para tarjetas */
+  --shadow-lg:   0 8px 48px rgba(0,0,0,0.16);   /* Sombra pronunciada para modales y toast */
+}
+
+/* ── RESET GLOBAL ──
+   Elimina márgenes, rellenos y asegura que el modelo de caja
+   incluya padding y border en el ancho/alto de cada elemento */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Desplazamiento suave al navegar con anclas internas */
+html { scroll-behavior: smooth; }
+
+/* Estilos base del cuerpo: fuente, fondo, color de texto y suavizado de fuentes */
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--warm-white);
+  color: var(--dark);
+  min-height: 100vh;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased; /* Mejora la nitidez del texto en pantallas de alta densidad */
+}
+
+/* ══════════════════════════════════════════════
+   NAVBAR
+   Barra de navegación fija en la parte superior.
+   Se mantiene visible al hacer scroll (sticky).
+══════════════════════════════════════════════ */
+nav {
+  background: var(--black);
+  padding: 0 3rem;
+  display: flex;
+  align-items: center;
+  height: 120px;
+  position: sticky;   /* Queda pegada al tope de la ventana al hacer scroll */
+  top: 0;
+  z-index: 100;       /* Asegura que se muestre por encima del contenido */
+  border-bottom: 1px solid var(--border-dark);
+}
+
+/* Contenedor del nombre de la marca (BARBER STYLE) */
+.nav-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  letter-spacing: 0.18em;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-left: 1.1rem;
+  margin-top: 1rem;
+}
+
+/* Contenedor del logo de la barbería */
+.brand-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Imagen del logo: tamaño fijo y ajuste de contenido para no deformarse */
+.brand-logo {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+}
+
+/* Texto "BARBER" en blanco y negrita */
+.brand-main {
+  color: var(--white);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  padding-bottom: 1.5rem;
+}
+
+/* Texto "STYLE" en dorado y peso regular, para contraste con "BARBER" */
+.brand-accent {
+  color: var(--accent);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+}
+
+/* Contenedor de las pestañas de navegación, empujado hacia la derecha */
+.nav-tabs { 
+  display: flex; gap: 0;
+  margin-left: 42rem; /* espacio entre logo y tabs */
+}
+
+/* Estilo base de cada pestaña de navegación */
+.nav-tab {
+  padding: 0 1.75rem;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  color: var(--muted);              /* Color apagado cuando no está activa */
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent; /* Espacio reservado para el subrayado activo */
+  background: none;
+  transition: all 0.2s;
+}
+
+/* Al pasar el cursor: color más claro */
+.nav-tab:hover  { color: var(--light); }
+
+/* Pestaña activa: texto blanco y línea dorada en la parte inferior */
+.nav-tab.active { color: var(--white); border-bottom-color: var(--accent); }
+
+/* Imagen decorativa de cabecera que ocupa todo el ancho de la pantalla */
+.header-image {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%); /* Truco para romper el contenedor y ocupar el ancho completo */
+  height: auto;
+  margin-bottom: 2.5rem;
+  object-fit: cover;
+}
+
+/* ══════════════════════════════════════════════
+   SCREENS (PANTALLAS)
+   Cada pantalla de la app (Agendar Cita, Clientes).
+   Solo la que tiene la clase "active" se muestra.
+══════════════════════════════════════════════ */
+.screen { display: none; padding: 3rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+.screen.active { display: block; }
+
+/* La pantalla de citas no necesita padding superior porque ya tiene la imagen de cabecera */
+#screen-citas { padding-top: 0; }
+
+
+/* ── ENCABEZADO DE SECCIÓN ──
+   Bloque de título, subtítulo y descripción que aparece en cada pantalla */
+.section-header { margin-bottom: 2.5rem; }
+
+/* Texto pequeño en dorado que aparece encima del título principal */
+.section-eyebrow {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+/* Título principal de la sección, grande y en fuente serif */
+.section-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* Descripción debajo del título, en gris apagado y peso liviano */
+.section-header p {
+  color: var(--muted);
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  font-weight: 300;
+}

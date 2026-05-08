@@ -1,0 +1,683 @@
+/* ══════════════════════════════════════════════
+   BARBER STYLE — Estilos principales
+   Inspirado en estética editorial dark & clean
+   Paleta: Negro profundo + Blanco + Crema cálida
+   Fuentes: Cormorant Garamond (display) + Jost (body)
+══════════════════════════════════════════════ */
+
+/* Importación de fuentes desde Google Fonts:
+   - Cormorant Garamond: fuente serif elegante usada en títulos y la marca
+   - Jost: fuente sans-serif moderna usada en el cuerpo del texto y botones */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
+
+/* ── VARIABLES GLOBALES (Design Tokens) ──
+   Definen la paleta de colores, bordes, sombras y radios
+   que se reutilizan en todo el archivo para mantener coherencia visual */
+:root {
+  --black:       #111111;        /* Negro principal para fondos oscuros y texto destacado */
+  --dark:        #1C1C1C;        /* Negro suavizado para texto general */
+  --charcoal:    #2A2A2A;        /* Gris muy oscuro para hover en botones primarios */
+  --mid:         #555555;        /* Gris medio para textos secundarios */
+  --muted:       #888888;        /* Gris apagado para textos terciarios (descripciones, placeholders) */
+  --light:       #CCCCCC;        /* Gris claro para texto desactivado */
+  --cream:       #F5F0E8;        /* Crema base para fondos cálidos */
+  --warm-white:  #FAF8F5;        /* Blanco cálido: color de fondo del body */
+  --white:       #FFFFFF;        /* Blanco puro para textos sobre fondos oscuros */
+  --accent:      #C8A96E;        /* Dorado: color de acento principal (navbar activo, toast, etc.) */
+  --crema:       #f2dfb4;        /* Crema dorada para fondos de tarjetas */
+  --crema-claro: #fbedcd;        /* Crema muy clara para inputs y elementos interactivos */
+  --accent-dark: #A8894E;        /* Dorado oscuro: hover de elementos con acento */
+  --danger:      #C0392B;        /* Rojo para errores, mensajes de validación y botón eliminar */
+  --success:     #27AE60;        /* Verde para mensajes de éxito (disponible para uso futuro) */
+  --border:      #E0D8CC;        /* Color de bordes suaves en tarjetas e inputs */
+  --border-dark: #333333;        /* Color de borde oscuro usado en la navbar */
+  --radius:      4px;            /* Radio de borde estándar para inputs y botones */
+  --radius-lg:   8px;            /* Radio de borde grande para tarjetas y modales */
+  --shadow:      0 2px 24px rgba(0,0,0,0.08);   /* Sombra suave para tarjetas */
+  --shadow-lg:   0 8px 48px rgba(0,0,0,0.16);   /* Sombra pronunciada para modales y toast */
+}
+
+/* ── RESET GLOBAL ──
+   Elimina márgenes, rellenos y asegura que el modelo de caja
+   incluya padding y border en el ancho/alto de cada elemento */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Desplazamiento suave al navegar con anclas internas */
+html { scroll-behavior: smooth; }
+
+/* Estilos base del cuerpo: fuente, fondo, color de texto y suavizado de fuentes */
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--warm-white);
+  color: var(--dark);
+  min-height: 100vh;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased; /* Mejora la nitidez del texto en pantallas de alta densidad */
+}
+
+/* ══════════════════════════════════════════════
+   NAVBAR
+   Barra de navegación fija en la parte superior.
+   Se mantiene visible al hacer scroll (sticky).
+══════════════════════════════════════════════ */
+nav {
+  background: var(--black);
+  padding: 0 3rem;
+  display: flex;
+  align-items: center;
+  height: 120px;
+  position: sticky;   /* Queda pegada al tope de la ventana al hacer scroll */
+  top: 0;
+  z-index: 100;       /* Asegura que se muestre por encima del contenido */
+  border-bottom: 1px solid var(--border-dark);
+}
+
+/* Contenedor del nombre de la marca (BARBER STYLE) */
+.nav-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  letter-spacing: 0.18em;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-left: 1.1rem;
+  margin-top: 1rem;
+}
+
+/* Contenedor del logo de la barbería */
+.brand-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Imagen del logo: tamaño fijo y ajuste de contenido para no deformarse */
+.brand-logo {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+}
+
+/* Texto "BARBER" en blanco y negrita */
+.brand-main {
+  color: var(--white);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  padding-bottom: 1.5rem;
+}
+
+/* Texto "STYLE" en dorado y peso regular, para contraste con "BARBER" */
+.brand-accent {
+  color: var(--accent);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+}
+
+/* Contenedor de las pestañas de navegación, empujado hacia la derecha */
+.nav-tabs { 
+  display: flex; gap: 0;
+  margin-left: 42rem; /* espacio entre logo y tabs */
+}
+
+/* Estilo base de cada pestaña de navegación */
+.nav-tab {
+  padding: 0 1.75rem;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  color: var(--muted);              /* Color apagado cuando no está activa */
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent; /* Espacio reservado para el subrayado activo */
+  background: none;
+  transition: all 0.2s;
+}
+
+/* Al pasar el cursor: color más claro */
+.nav-tab:hover  { color: var(--light); }
+
+/* Pestaña activa: texto blanco y línea dorada en la parte inferior */
+.nav-tab.active { color: var(--white); border-bottom-color: var(--accent); }
+
+/* Imagen decorativa de cabecera que ocupa todo el ancho de la pantalla */
+.header-image {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%); /* Truco para romper el contenedor y ocupar el ancho completo */
+  height: auto;
+  margin-bottom: 2.5rem;
+  object-fit: cover;
+}
+
+/* ══════════════════════════════════════════════
+   SCREENS (PANTALLAS)
+   Cada pantalla de la app (Agendar Cita, Clientes).
+   Solo la que tiene la clase "active" se muestra.
+══════════════════════════════════════════════ */
+.screen { display: none; padding: 3rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+.screen.active { display: block; }
+
+/* La pantalla de citas no necesita padding superior porque ya tiene la imagen de cabecera */
+#screen-citas { padding-top: 0; }
+
+
+/* ── ENCABEZADO DE SECCIÓN ──
+   Bloque de título, subtítulo y descripción que aparece en cada pantalla */
+.section-header { margin-bottom: 2.5rem; }
+
+/* Texto pequeño en dorado que aparece encima del título principal */
+.section-eyebrow {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+/* Título principal de la sección, grande y en fuente serif */
+.section-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* Descripción debajo del título, en gris apagado y peso liviano */
+.section-header p {
+  color: var(--muted);
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  font-weight: 300;
+}
+
+/* ══════════════════════════════════════════════
+   TARJETA DEL FORMULARIO
+   Contenedor principal del formulario de agendar cita.
+══════════════════════════════════════════════ */
+.form-card {
+  background: var(--crema);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow);
+}
+
+/* Grid de dos columnas para organizar los campos del formulario */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+/* Cada grupo de campo: label + input + mensaje de error, apilados verticalmente */
+.form-group { display: flex; flex-direction: column; gap: 0.45rem; }
+
+/* Clase para que un campo ocupe las dos columnas completas del grid */
+.form-group.full { grid-column: 1 / -1; }
+
+/* Estilo de todas las etiquetas de campo */
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--black);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Estilo base compartido para inputs, selects y textareas */
+input, select, textarea {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--crema-claro);
+  color: var(--dark);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  width: 100%;
+}
+
+/* Estado de foco: borde dorado y sombra suave para indicar que está activo */
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(200,169,110,0.12);
+  background: var(--accent-dark);
+}
+
+/* Estado de error: borde rojo y sombra roja para indicar validación fallida */
+input.error, select.error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
+}
+
+/* Asegura que el selector de fecha use el esquema de colores claro del sistema */
+input[type="date"] { color-scheme: light; }
+
+/* Campo de solo lectura: fondo gris y cursor de "no permitido" */
+input:readonly {
+  background: #EEEEEE;
+  color: var(--mid);
+  cursor: not-allowed;
+}
+
+/* Mensaje de error debajo de cada campo: oculto por defecto */
+.error-msg          { font-size: 0.75rem; color: var(--danger); display: none; margin-top: 0.1rem; }
+/* Se hace visible cuando JavaScript añade la clase "visible" */
+.error-msg.visible  { display: block; }
+
+/* ── GRID DE SERVICIOS ──
+   Cuadrícula de 3 columnas para los checkboxes de servicios disponibles */
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+
+/* Cada opción de servicio: etiqueta que contiene el checkbox y el nombre */
+.service-check {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.6rem 0.85rem; border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; transition: all 0.15s;
+  background: var(--crema-claro);
+}
+
+/* Hover: fondo dorado oscuro y texto blanco */
+.service-check:hover   { border-color: var(--accent-dark); background: var(--accent-dark); color: var(--white); }
+
+/* Checkbox interno: tamaño fijo y color de acento */
+.service-check input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; padding: 0; flex-shrink: 0; }
+
+/* Texto del nombre del servicio */
+.service-check span    { font-size: 0.83rem; color: var(--dark); }
+
+/* Al pasar el cursor, el texto también se vuelve blanco */
+.service-check:hover span { color: var(--white); }
+
+/* Estado seleccionado: borde dorado y fondo crema muy suave */
+.service-check.selected { border-color: var(--accent); background: #FDF8EE; }
+
+/* ── GRID DE HORARIOS (SLOTS) ──
+   Cuadrícula de 5 columnas para los botones de horarios disponibles */
+.slots-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+
+/* Estilo base de cada botón de horario */
+.slot {
+  padding: 0.65rem 0.5rem; text-align: center; font-size: 0.83rem;
+  font-family: 'Jost', sans-serif; font-weight: 500;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; transition: all 0.15s;
+  background: var(--crema-claro); color: var(--dark);
+  letter-spacing: 0.03em;
+}
+
+/* Hover solo si el horario NO está ocupado */
+.slot:hover:not(.taken) { border-color: var(--accent-dark); color: var(--white); background: var(--accent-dark); }
+
+/* Horario ocupado: apariencia desactivada con texto tachado */
+.slot.taken    { background: #F2EEEA; color: #BBAFA5; cursor: not-allowed; text-decoration: line-through; }
+
+/* Horario seleccionado: fondo negro y texto blanco */
+.slot.selected { background: var(--black); border-color: var(--black); color: var(--white); }
+
+/* ── TARJETAS DE BARBERO ──
+   Cuadrícula de 3 columnas para seleccionar el barbero deseado */
+.barbers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+
+/* Tarjeta individual de cada barbero */
+.barber-card {
+  padding: 1.25rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg);
+  cursor: pointer; transition: all 0.18s; text-align: center; background: var(--crema-claro);
+}
+
+/* Hover: fondo dorado oscuro */
+.barber-card:hover    { border-color: var(--accent-dark); background: var(--accent-dark); color: var(--white); }
+
+/* Tarjeta seleccionada: fondo negro */
+.barber-card.selected { border-color: var(--black); background: var(--black); }
+
+/* Nombre del barbero en tarjeta seleccionada: texto blanco */
+.barber-card.selected .barber-name { color: var(--white); }
+
+/* Especialidad del barbero en tarjeta seleccionada: texto gris */
+.barber-card.selected .barber-spec { color: var(--muted); }
+
+/* Avatar circular con iniciales del barbero */
+.barber-avatar {
+  width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 0.65rem;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--white);
+  letter-spacing: 0.05em;
+}
+
+/* Nombre del barbero debajo del avatar */
+.barber-name { font-size: 0.87rem; font-weight: 600; color: var(--dark); letter-spacing: 0.03em; }
+
+/* Especialidad del barbero en texto pequeño y apagado */
+.barber-spec { font-size: 0.74rem; color: var(--muted); margin-top: 0.2rem; font-weight: 300; }
+
+/* Al pasar el cursor, nombre y especialidad se vuelven blancos */
+.barber-card:hover .barber-name { color: var(--white); }
+.barber-card:hover .barber-spec { color: var(--white); }
+
+/* ── BOTONES DE ACCIÓN DEL FORMULARIO ──
+   Fila de botones al final del formulario (Limpiar / Confirmar) */
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+}
+
+/* ══════════════════════════════════════════════
+   BOTONES REUTILIZABLES
+   Estilo base compartido y variantes por tipo.
+══════════════════════════════════════════════ */
+.btn {
+  padding: 0.72rem 2rem; border-radius: var(--radius);
+  font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.18s; border: 1px solid transparent;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+}
+
+/* Botón secundario: transparente con borde gris (ej: "Limpiar") */
+.btn-outline {
+  background: transparent; border-color: var(--border); color: var(--mid);
+}
+.btn-outline:hover { border-color: var(--dark); color: var(--dark); }
+
+/* Botón principal: fondo negro (ej: "Confirmar Cita", "Nuevo Cliente") */
+.btn-primary {
+  background: var(--black); color: var(--white); border-color: var(--black);
+}
+.btn-primary:hover { background: var(--charcoal); border-color: var(--charcoal); }
+
+/* Botón de peligro: borde y texto rojo, relleno al hacer hover (ej: "Eliminar") */
+.btn-danger {
+  background: transparent; color: var(--danger); border-color: var(--danger);
+}
+.btn-danger:hover { background: var(--danger); color: var(--white); }
+
+/* Variante pequeña de botón para usar en tablas o espacios reducidos */
+.btn-sm { padding: 0.38rem 0.9rem; font-size: 0.7rem; }
+
+/* Botón desactivado: opacidad reducida y cursor de "no permitido" */
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ══════════════════════════════════════════════
+   TOAST (NOTIFICACIÓN EMERGENTE)
+   Aparece en la esquina superior derecha para informar
+   al usuario sobre el resultado de sus acciones.
+══════════════════════════════════════════════ */
+.toast {
+  position: fixed; top: 88px; right: 2rem;
+  background: var(--accent); color: var(--white);
+  padding: 1rem 1.5rem; border-radius: var(--radius-lg);
+  border-left: 3px solid var(--accent);  /* Línea lateral decorativa */
+  font-size: 0.88rem; z-index: 999;
+  opacity: 0; transform: translateY(-8px); /* Oculto y desplazado hacia arriba por defecto */
+  transition: all 0.3s; pointer-events: none; /* No interactúa con el mouse cuando está oculto */
+  min-width: 260px; max-width: 380px;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Estado visible: opacidad completa y posición normal */
+.toast.show  { opacity: 1; transform: translateY(0); }
+
+/* Variante de error: línea lateral roja para diferenciar del éxito */
+.toast.error { border-left-color: var(--danger); }
+
+/* Título del toast en negro */
+.toast-title { font-weight: 600; margin-bottom: 0.2rem; font-size: 0.9rem; color: var(--black); }
+
+/* Mensaje del toast en negro, tamaño más pequeño */
+.toast-msg   { color: var(--black); font-size: 0.8rem; line-height: 1.4; }
+
+/* ══════════════════════════════════════════════
+   BARRA DE HERRAMIENTAS CRUD
+   Fila superior de la pantalla de clientes con
+   el buscador y el botón para agregar cliente.
+══════════════════════════════════════════════ */
+.crud-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+
+/* El campo de búsqueda toma todo el espacio disponible */
+.crud-bar > input {
+  flex: 1;
+}
+
+/* Campo de búsqueda con ícono de lupa como fondo SVG inline */
+.search-input {
+  padding: 0.7rem 1.1rem 0.7rem 2.5rem; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--crema-claro) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>') no-repeat 0.7rem center;
+  background-size: 18px 18px;
+  font-family: 'Jost', sans-serif; font-size: 0.95rem;
+  width: 100%; color: var(--dark); outline: none;
+  transition: border-color 0.2s;
+}
+/* Borde dorado al enfocar el buscador */
+.search-input:focus { border-color: var(--accent); }
+/* Placeholder en gris claro */
+.search-input::placeholder { color: var(--light); }
+
+/* ══════════════════════════════════════════════
+   TABLA DE CLIENTES
+   Muestra el listado de clientes con sus datos
+   y los botones de acción por fila.
+══════════════════════════════════════════════ */
+
+/* Tarjeta contenedora de la tabla con borde, radio y sombra */
+.table-card {
+  background: var(--crema-claro); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow);
+}
+
+/* La tabla ocupa todo el ancho sin separación entre celdas */
+table { width: 100%; border-collapse: collapse; }
+
+/* Encabezados de columna: fondo negro y texto dorado */
+thead th {
+  background: var(--black); color: var(--accent);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  padding: 1rem 1.1rem; text-align: left;
+}
+
+/* Filas del cuerpo: separadas por una línea delgada, con transición de fondo */
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+
+/* La última fila no tiene línea separadora */
+tbody tr:last-child { border-bottom: none; }
+
+/* Al pasar el cursor sobre una fila: fondo dorado oscuro */
+tbody tr:hover { background: var(--accent-dark); }
+
+/* Al hacer hover en la fila, el texto de todas las celdas se vuelve blanco */
+tbody tr:hover td { color: var(--white); }
+
+/* Celdas de datos con padding generoso y texto en negro */
+td {
+  padding: 0.9rem 1.1rem; font-size: 1rem; color: var(--black);
+}
+
+/* Celda de documento: fuente monoespaciada para mejorar la lectura de números */
+.td-doc   { font-family: monospace; font-size: 0.82rem; color: var(--mid); }
+
+/* Celda de nombre: negrita para resaltar */
+.td-name  { font-weight: 500; }
+
+/* Celda de email: color apagado ya que es información secundaria */
+.td-email { color: var(--muted); }
+
+/* Celda de acciones: fila horizontal con botones de editar y eliminar */
+.td-actions { display: flex; gap: 0.5rem; }
+
+/* ══════════════════════════════════════════════
+   MODALES (VENTANAS EMERGENTES)
+   Overlay oscuro + panel blanco centrado.
+   Se muestran/ocultan con la clase "open".
+══════════════════════════════════════════════ */
+
+/* Fondo oscuro semitransparente que cubre toda la pantalla */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(17,17,17,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; opacity: 0; pointer-events: none; /* Invisible e inactivo por defecto */
+  transition: opacity 0.22s; backdrop-filter: blur(3px); /* Desenfoque del fondo */
+}
+
+/* Al agregar la clase "open": se vuelve visible e interactivo */
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+/* Panel del modal: fondo blanco, bordes redondeados, scroll interno si hay mucho contenido */
+.modal {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 2.25rem; width: 480px; max-width: 95vw;
+  max-height: 90vh; overflow-y: auto;
+  transform: scale(0.96) translateY(8px); /* Inicia levemente encogido y desplazado */
+  transition: transform 0.22s; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+/* Al abrir el modal: animación de entrada que lo lleva a tamaño y posición normal */
+.modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+/* Variante de modal más pequeño para confirmaciones */
+.modal-sm { width: 400px; }
+
+/* Cabecera del modal con título y botón de cierre */
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.75rem; padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Título del modal en fuente serif */
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 600; color: var(--black);
+}
+
+/* Botón de cierre (✕) del modal */
+.modal-close {
+  background: none; border: none; font-size: 1.1rem;
+  color: var(--muted); cursor: pointer; padding: 0.2rem 0.4rem;
+  border-radius: var(--radius); transition: color 0.15s;
+}
+.modal-close:hover { color: var(--dark); }
+
+/* Formulario interno del modal: campos apilados verticalmente */
+.modal-form   { display: flex; flex-direction: column; gap: 1.1rem; }
+
+/* Fila de botones al pie del modal */
+.modal-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  margin-top: 1.75rem; padding-top: 1rem; border-top: 1px solid var(--border);
+}
+
+/* Mensaje del modal de confirmación de eliminación */
+.confirm-msg { color: var(--mid); font-size: 0.92rem; margin-bottom: 0.5rem; line-height: 1.6; }
+
+/* Nombre del cliente resaltado en negrita dentro del mensaje de confirmación */
+.confirm-name { font-weight: 600; color: var(--dark); }
+
+/* ══════════════════════════════════════════════
+   PAGINACIÓN
+   Barra inferior de la tabla con información de registros
+   y botones para navegar entre páginas.
+══════════════════════════════════════════════ */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.1rem; border-top: 1px solid var(--border);
+  font-size: 0.82rem; color: var(--muted);
+}
+
+/* Contenedor de los botones numéricos de página */
+.page-btns { display: flex; gap: 0.35rem; }
+
+/* Botón individual de página */
+.page-btn {
+  padding: 0.35rem 0.7rem; border: 1px solid var(--border);
+  border-radius: var(--radius); background: none; color: var(--dark);
+  cursor: pointer; font-family: 'Jost', sans-serif;
+  font-size: 0.78rem; transition: all 0.12s;
+}
+
+/* Hover: borde y texto dorado */
+.page-btn:hover    { border-color: var(--accent); color: var(--accent); }
+
+/* Página actualmente seleccionada: fondo negro y texto blanco */
+.page-btn.active   { background: var(--black); border-color: var(--black); color: var(--white); }
+
+/* Botón desactivado (ej: "Anterior" en la primera página) */
+.page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ══════════════════════════════════════════════
+   SPINNER DE CARGA
+   Ícono animado de círculo giratorio que indica
+   que una operación está en progreso.
+══════════════════════════════════════════════ */
+.spinner {
+  display: inline-block; width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.3);   /* Borde parcialmente transparente */
+  border-top-color: var(--white);            /* Solo la parte superior es opaca, creando el efecto giratorio */
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;      /* Gira indefinidamente */
+  vertical-align: middle;
+}
+
+/* Animación de rotación completa del spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE — TABLETAS (max 768px)
+   Reorganiza el layout para pantallas medianas:
+   formulario en 1 columna, grids reducidos.
+══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  nav { padding: 0 1.25rem; }
+  .screen { padding: 2rem 1.25rem 3rem; }
+  .form-grid { grid-template-columns: 1fr; }              /* Formulario en una sola columna */
+  .services-grid { grid-template-columns: 1fr 1fr; }      /* Servicios en 2 columnas */
+  .barbers-grid  { grid-template-columns: 1fr 1fr; }      /* Barberos en 2 columnas */
+  .slots-grid    { grid-template-columns: repeat(3, 1fr); } /* Horarios en 3 columnas */
+  .brand-main, .brand-accent { font-size: 1.15rem; }      /* Nombre de marca más pequeño */
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE — MÓVILES (max 480px)
+   Ajustes para pantallas muy pequeñas:
+   elementos apilados en columna única.
+══════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .search-input { width: 100%; }
+  .crud-bar { flex-direction: column; align-items: stretch; } /* Buscador y botón en columna */
+  .form-card { padding: 1.5rem; }  
+}
+
+/* ══════════════════════════════════════════════
+   ACCESIBILIDAD
+   Mejoras para usuarios que navegan con teclado
+   o que prefieren reducir el movimiento en pantalla.
+══════════════════════════════════════════════ */
+
+/* Anillo de foco visible para navegación con teclado: borde dorado */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Desactiva todas las animaciones y transiciones para usuarios que así lo configuraron
+   en sus preferencias del sistema operativo (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

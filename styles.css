@@ -519,3 +519,148 @@ td {
 
 /* Celda de acciones: fila horizontal con botones de editar y eliminar */
 .td-actions { display: flex; gap: 0.5rem; }
+
+/* ══════════════════════════════════════════════
+   MODALES (VENTANAS EMERGENTES)
+   Overlay oscuro + panel blanco centrado.
+   Se muestran/ocultan con la clase "open".
+══════════════════════════════════════════════ */
+
+/* Fondo oscuro semitransparente que cubre toda la pantalla */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(17,17,17,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; opacity: 0; pointer-events: none; /* Invisible e inactivo por defecto */
+  transition: opacity 0.22s; backdrop-filter: blur(3px); /* Desenfoque del fondo */
+}
+
+/* Al agregar la clase "open": se vuelve visible e interactivo */
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+/* Panel del modal: fondo blanco, bordes redondeados, scroll interno si hay mucho contenido */
+.modal {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 2.25rem; width: 480px; max-width: 95vw;
+  max-height: 90vh; overflow-y: auto;
+  transform: scale(0.96) translateY(8px); /* Inicia levemente encogido y desplazado */
+  transition: transform 0.22s; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+/* Al abrir el modal: animación de entrada que lo lleva a tamaño y posición normal */
+.modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+/* Variante de modal más pequeño para confirmaciones */
+.modal-sm { width: 400px; }
+
+/* Cabecera del modal con título y botón de cierre */
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.75rem; padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Título del modal en fuente serif */
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 600; color: var(--black);
+}
+
+/* Botón de cierre (✕) del modal */
+.modal-close {
+  background: none; border: none; font-size: 1.1rem;
+  color: var(--muted); cursor: pointer; padding: 0.2rem 0.4rem;
+  border-radius: var(--radius); transition: color 0.15s;
+}
+.modal-close:hover { color: var(--dark); }
+
+/* Formulario interno del modal: campos apilados verticalmente */
+.modal-form   { display: flex; flex-direction: column; gap: 1.1rem; }
+
+/* Fila de botones al pie del modal */
+.modal-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  margin-top: 1.75rem; padding-top: 1rem; border-top: 1px solid var(--border);
+}
+
+/* Mensaje del modal de confirmación de eliminación */
+.confirm-msg { color: var(--mid); font-size: 0.92rem; margin-bottom: 0.5rem; line-height: 1.6; }
+
+/* Nombre del cliente resaltado en negrita dentro del mensaje de confirmación */
+.confirm-name { font-weight: 600; color: var(--dark); }
+
+/* ══════════════════════════════════════════════
+   PAGINACIÓN
+   Barra inferior de la tabla con información de registros
+   y botones para navegar entre páginas.
+══════════════════════════════════════════════ */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.1rem; border-top: 1px solid var(--border);
+  font-size: 0.82rem; color: var(--muted);
+}
+
+/* Contenedor de los botones numéricos de página */
+.page-btns { display: flex; gap: 0.35rem; }
+
+/* Botón individual de página */
+.page-btn {
+  padding: 0.35rem 0.7rem; border: 1px solid var(--border);
+  border-radius: var(--radius); background: none; color: var(--dark);
+  cursor: pointer; font-family: 'Jost', sans-serif;
+  font-size: 0.78rem; transition: all 0.12s;
+}
+
+/* Hover: borde y texto dorado */
+.page-btn:hover    { border-color: var(--accent); color: var(--accent); }
+
+/* Página actualmente seleccionada: fondo negro y texto blanco */
+.page-btn.active   { background: var(--black); border-color: var(--black); color: var(--white); }
+
+/* Botón desactivado (ej: "Anterior" en la primera página) */
+.page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ══════════════════════════════════════════════
+   SPINNER DE CARGA
+   Ícono animado de círculo giratorio que indica
+   que una operación está en progreso.
+══════════════════════════════════════════════ */
+.spinner {
+  display: inline-block; width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.3);   /* Borde parcialmente transparente */
+  border-top-color: var(--white);            /* Solo la parte superior es opaca, creando el efecto giratorio */
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;      /* Gira indefinidamente */
+  vertical-align: middle;
+}
+
+/* Animación de rotación completa del spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE — TABLETAS (max 768px)
+   Reorganiza el layout para pantallas medianas:
+   formulario en 1 columna, grids reducidos.
+══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  nav { padding: 0 1.25rem; }
+  .screen { padding: 2rem 1.25rem 3rem; }
+  .form-grid { grid-template-columns: 1fr; }              /* Formulario en una sola columna */
+  .services-grid { grid-template-columns: 1fr 1fr; }      /* Servicios en 2 columnas */
+  .barbers-grid  { grid-template-columns: 1fr 1fr; }      /* Barberos en 2 columnas */
+  .slots-grid    { grid-template-columns: repeat(3, 1fr); } /* Horarios en 3 columnas */
+  .brand-main, .brand-accent { font-size: 1.15rem; }      /* Nombre de marca más pequeño */
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE — MÓVILES (max 480px)
+   Ajustes para pantallas muy pequeñas:
+   elementos apilados en columna única.
+══════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .search-input { width: 100%; }
+  .crud-bar { flex-direction: column; align-items: stretch; } /* Buscador y botón en columna */
+  .form-card { padding: 1.5rem; }  
+}
+

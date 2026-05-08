@@ -187,6 +187,90 @@
   </div>
 </div>
 
-    
+<!-- =========================================================
+     MODAL – CREAR / EDITAR CLIENTE
+     Ventana emergente con formulario para registrar un cliente
+     nuevo o modificar los datos de uno existente.
+     ========================================================= -->
+<div class="modal-overlay" id="clientModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+
+    <!-- Cabecera del modal con título dinámico y botón de cierre -->
+    <div class="modal-header">
+      <!-- El título cambia entre "Nuevo Cliente" y "Editar Cliente" según el contexto -->
+      <h2 class="modal-title" id="modalTitle">Nuevo Cliente</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- Campos del formulario del modal -->
+    <div class="modal-form">
+
+      <!-- Documento: solo lectura al editar (no se puede cambiar la cédula) -->
+      <div class="form-group">
+        <label for="mDoc">Cédula / Tarjeta de identidad *</label>
+        <input type="text" id="mDoc" placeholder="Número de documento" inputmode="numeric" readonly />
+        <span class="error-msg" id="mErr-doc">Ingresa un número de documento válido</span>
+      </div>
+
+      <!-- Nombre completo del cliente -->
+      <div class="form-group">
+        <label for="mName">Nombre completo *</label>
+        <input type="text" id="mName" placeholder="Nombre y apellidos" />
+        <span class="error-msg" id="mErr-name">Ingresa el nombre</span>
+      </div>
+
+      <!-- Teléfono de contacto -->
+      <div class="form-group">
+        <label for="mPhone">Teléfono *</label>
+        <input type="tel" id="mPhone" placeholder="300 000 0000" />
+        <span class="error-msg" id="mErr-phone">Ingresa un teléfono válido (10 dígitos)</span>
+      </div>
+
+      <!-- Correo electrónico (opcional) -->
+      <div class="form-group">
+        <label for="mEmail">Email</label>
+        <input type="email" id="mEmail" placeholder="correo@ejemplo.com" />
+        <span class="error-msg" id="mErr-email">Ingresa un email válido</span>
+      </div>
+    </div>
+
+    <!-- Botones del modal: el comportamiento cambia según si se está creando o editando -->
+    <div class="modal-actions">
+      <!-- En modo creación: limpia los campos. En modo edición: cancela los cambios -->
+      <button class="btn btn-outline" id="modalCancelBtn" onclick="handleModalCancel()">Limpiar</button>
+      <!-- Guarda el cliente nuevo o actualiza el existente -->
+      <button class="btn btn-primary" id="modalSaveBtn"   onclick="saveCliente()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     MODAL DE CONFIRMACIÓN – ELIMINAR CLIENTE
+     Ventana emergente que pide confirmación antes de borrar
+     un cliente, para evitar eliminaciones accidentales.
+     ========================================================= -->
+<div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal modal-sm">
+
+    <!-- Cabecera con título y botón de cierre -->
+    <div class="modal-header">
+      <h2 class="modal-title" id="confirmTitle">Eliminar Cliente</h2>
+      <button class="modal-close" onclick="closeConfirm()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- Mensaje de advertencia: muestra el nombre del cliente a eliminar (se inyecta dinámicamente) -->
+    <p class="confirm-msg">¿Estás seguro de eliminar a <span class="confirm-name" id="confirmName"></span>? Esta acción no se puede deshacer.</p>
+
+    <!-- Botones: cancelar vuelve atrás, eliminar ejecuta el borrado definitivo -->
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-danger"  onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Script principal: contiene toda la lógica de la aplicación (barberos, horarios, servicios, CRUD, validaciones, etc.) -->
+<script src="app.js"></script>
 </body>
 </html>

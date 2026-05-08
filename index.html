@@ -13,6 +13,44 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
+<!-- =========================================================
+     BARRA DE NAVEGACIÓN PRINCIPAL
+     Contiene el logo, el nombre de la marca y las pestañas
+     para cambiar entre las pantallas de la aplicación.
+     ========================================================= -->
+<nav role="navigation" aria-label="Navegación principal">
+
+  <!-- Logo visual de la barbería -->
+  <div class="brand-logo-container">
+    <img src="logo.png" alt="Logo de Barber Style" class="brand-logo" />
+  </div>
+
+  <!-- Nombre de la marca dividido en dos partes para aplicar estilos diferentes -->
+  <div class="nav-brand">
+    <span class="brand-main">BARBER</span>
+    <span class="brand-accent">STYLE</span>
+  </div>
+
+  <!-- Pestañas de navegación: al hacer clic se muestra la pantalla correspondiente -->
+  <div class="nav-tabs" role="tablist">
+    <!-- Pestaña activa por defecto: muestra la pantalla de agendar cita -->
+    <button class="nav-tab active" role="tab" aria-selected="true"  onclick="showScreen('citas')">Agendar Cita</button>
+    <!-- Pestaña para ir al módulo de gestión de clientes -->
+    <button class="nav-tab"        role="tab" aria-selected="false" onclick="showScreen('clientes')">Clientes</button>
+  </div>
+</nav>
+
+<!-- =========================================================
+     NOTIFICACIÓN TIPO TOAST
+     Mensaje emergente temporal que aparece en pantalla para
+     informar al usuario sobre el resultado de una acción
+     (ej: cita confirmada, error al guardar, etc.)
+     ========================================================= -->
+<div class="toast" id="toast" role="alert" aria-live="assertive">
+  <div class="toast-title" id="toastTitle"></div> <!-- Título del mensaje (ej: "Éxito") -->
+  <div class="toast-msg"   id="toastMsg"></div>   <!-- Descripción del mensaje -->
+</div>
     
 </body>
 </html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barber Style – Sistema de Agendamiento</title>
+
+  <!-- Fuentes de Google: Cormorant Garamond para títulos elegantes, Jost para texto general -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Hoja de estilos principal de la aplicación -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- =========================================================
+     BARRA DE NAVEGACIÓN PRINCIPAL
+     Contiene el logo, el nombre de la marca y las pestañas
+     para cambiar entre las pantallas de la aplicación.
+     ========================================================= -->
+<nav role="navigation" aria-label="Navegación principal">
+
+  <!-- Logo visual de la barbería -->
+  <div class="brand-logo-container">
+    <img src="logo.png" alt="Logo de Barber Style" class="brand-logo" />
+  </div>
+
+  <!-- Nombre de la marca dividido en dos partes para aplicar estilos diferentes -->
+  <div class="nav-brand">
+    <span class="brand-main">BARBER</span>
+    <span class="brand-accent">STYLE</span>
+  </div>
+
+  <!-- Pestañas de navegación: al hacer clic se muestra la pantalla correspondiente -->
+  <div class="nav-tabs" role="tablist">
+    <!-- Pestaña activa por defecto: muestra la pantalla de agendar cita -->
+    <button class="nav-tab active" role="tab" aria-selected="true"  onclick="showScreen('citas')">Agendar Cita</button>
+    <!-- Pestaña para ir al módulo de gestión de clientes -->
+    <button class="nav-tab"        role="tab" aria-selected="false" onclick="showScreen('clientes')">Clientes</button>
+  </div>
+</nav>
+
+<!-- =========================================================
+     NOTIFICACIÓN TIPO TOAST
+     Mensaje emergente temporal que aparece en pantalla para
+     informar al usuario sobre el resultado de una acción
+     (ej: cita confirmada, error al guardar, etc.)
+     ========================================================= -->
+<div class="toast" id="toast" role="alert" aria-live="assertive">
+  <div class="toast-title" id="toastTitle"></div> <!-- Título del mensaje (ej: "Éxito") -->
+  <div class="toast-msg"   id="toastMsg"></div>   <!-- Descripción del mensaje -->
+</div>
+
+
+<!-- =========================================================
+     PANTALLA 1 – AGENDAR CITA
+     Formulario principal donde el cliente llena sus datos,
+     elige barbero, horario y servicios para reservar su turno.
+     ========================================================= -->
+<div class="screen active" id="screen-citas">
+
+  <!-- Imagen decorativa de cabecera para ambientar la pantalla -->
+  <img src="header-fondo.jpg" alt="Banner de Barber Style" class="header-image" />
+
+  <!-- Encabezado de sección con título y descripción -->
+  <div class="section-header">
+    <div class="section-eyebrow">Reserva tu turno</div>
+    <h1>Agendar Cita</h1>
+    <p>Completa el formulario para reservar tu turno en Barber Style</p>
+  </div>
+
+  <!-- Formulario de agendamiento de cita (novalidate desactiva la validación nativa del navegador) -->
+  <form class="form-card" id="appointmentForm" novalidate>
+    <div class="form-grid">
+
+      <!-- Campo: Documento de identidad del cliente (solo números) -->
+      <div class="form-group">
+        <label for="clientDoc">Cédula / Tarjeta de identidad *</label>
+        <input type="text" id="clientDoc" placeholder="Ej: 1094900202" inputmode="numeric" aria-required="true" />
+        <!-- Mensaje de error que se muestra si la validación falla -->
+        <span class="error-msg" id="err-clientDoc">Ingresa un número de documento válido</span>
+      </div>
+
+      <!-- Campo: Nombre completo del cliente -->
+      <div class="form-group">
+        <label for="clientName">Nombre completo *</label>
+        <input type="text" id="clientName" placeholder="Ej: Carlos Pérez" autocomplete="name" aria-required="true" />
+        <span class="error-msg" id="err-clientName">Ingresa el nombre completo</span>
+      </div>
+
+      <!-- Campo: Teléfono de contacto (10 dígitos) -->
+      <div class="form-group">
+        <label for="clientPhone">Teléfono *</label>
+        <input type="tel" id="clientPhone" placeholder="300 000 0000" autocomplete="tel" aria-required="true" />
+        <span class="error-msg" id="err-clientPhone">Ingresa un teléfono válido (10 dígitos)</span>
+      </div>
+
+      <!-- Campo: Correo electrónico (opcional) -->
+      <div class="form-group">
+        <label for="clientEmail">Correo electrónico</label>
+        <input type="email" id="clientEmail" placeholder="correo@ejemplo.com" autocomplete="email" />
+        <span class="error-msg" id="err-clientEmail">Ingresa un correo válido</span>
+      </div>
+
+      <!-- Campo: Fecha en que el cliente desea la cita -->
+      <div class="form-group">
+        <label for="apptDate">Fecha de la cita *</label>
+        <input type="date" id="apptDate" aria-required="true" />
+        <span class="error-msg" id="err-apptDate">Selecciona una fecha válida</span>
+      </div>
+
+      <!-- Selector de barbero: los botones se generan dinámicamente desde app.js -->
+      <div class="form-group full">
+        <label>Barbero *</label>
+        <div class="barbers-grid" id="barberGrid" role="radiogroup" aria-label="Seleccionar barbero"></div>
+        <span class="error-msg" id="err-barber">Selecciona un barbero</span>
+      </div>
+
+      <!-- Selector de horario: los botones de horas disponibles se generan dinámicamente desde app.js -->
+      <div class="form-group full">
+        <label>Horario disponible *</label>
+        <div class="slots-grid" id="slotsGrid" role="radiogroup" aria-label="Seleccionar horario"></div>
+        <span class="error-msg" id="err-slot">Selecciona un horario</span>
+      </div>
+
+      <!-- Selector de servicios: casillas de verificación generadas dinámicamente desde app.js -->
+      <div class="form-group full">
+        <label>Servicios solicitados * (selecciona al menos uno)</label>
+        <div class="services-grid" id="servicesGrid" role="group" aria-label="Servicios"></div>
+        <span class="error-msg" id="err-services">Selecciona al menos un servicio</span>
+      </div>
+
+    </div>
+
+    <!-- Botones de acción del formulario -->
+    <div class="form-actions">
+      <!-- Botón para limpiar todos los campos del formulario -->
+      <button type="button" class="btn btn-outline" onclick="resetForm()">Limpiar</button>
+      <!-- Botón para enviar y confirmar la cita -->
+      <button type="submit" class="btn btn-primary">Confirmar Cita</button>
+    </div>
+  </form>
+</div>
+
+<!-- =========================================================
+     PANTALLA 2 – GESTIÓN DE CLIENTES (CRUD)
+     Permite buscar, agregar, editar y eliminar clientes
+     registrados en el sistema. Incluye tabla paginada.
+     ========================================================= -->
+<div class="screen" id="screen-clientes">
+
+  <!-- Encabezado de la sección de administración -->
+  <div class="section-header">
+    <div class="section-eyebrow">Administración</div>
+    <h1>Gestión de Clientes</h1>
+    <p>Administra los registros de clientes del sistema</p>
+  </div>
+
+  <!-- Barra de herramientas: búsqueda en tiempo real y botón para agregar nuevo cliente -->
+  <div class="crud-bar">
+    <!-- Campo de búsqueda: filtra la tabla mientras el usuario escribe -->
+    <input type="search" class="search-input" id="searchInput"
+           placeholder="Buscar por nombre, documento o teléfono..."
+           oninput="filterClientes()" aria-label="Buscar clientes" />
+    <!-- Botón que abre el modal para crear un nuevo cliente -->
+    <button class="btn btn-primary" onclick="openModal()">+ Nuevo Cliente</button>
+  </div>
+
+  <!-- Tabla de clientes con paginación -->
+  <div class="table-card">
+    <table role="grid" aria-label="Lista de clientes">
+      <thead>
+        <tr>
+          <th scope="col">Documento</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Teléfono</th>
+          <th scope="col">Email</th>
+          <th scope="col">Acciones</th> <!-- Columna con botones de editar y eliminar -->
+        </tr>
+      </thead>
+      <!-- Las filas de clientes se generan dinámicamente desde app.js -->
+      <tbody id="clientesTableBody"></tbody>
+    </table>
+    <!-- Controles de paginación generados dinámicamente desde app.js -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- =========================================================
+     MODAL – CREAR / EDITAR CLIENTE
+     Ventana emergente con formulario para registrar un cliente
+     nuevo o modificar los datos de uno existente.
+     ========================================================= -->
+<div class="modal-overlay" id="clientModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+
+    <!-- Cabecera del modal con título dinámico y botón de cierre -->
+    <div class="modal-header">
+      <!-- El título cambia entre "Nuevo Cliente" y "Editar Cliente" según el contexto -->
+      <h2 class="modal-title" id="modalTitle">Nuevo Cliente</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- Campos del formulario del modal -->
+    <div class="modal-form">
+
+      <!-- Documento: solo lectura al editar (no se puede cambiar la cédula) -->
+      <div class="form-group">
+        <label for="mDoc">Cédula / Tarjeta de identidad *</label>
+        <input type="text" id="mDoc" placeholder="Número de documento" inputmode="numeric" readonly />
+        <span class="error-msg" id="mErr-doc">Ingresa un número de documento válido</span>
+      </div>
+
+      <!-- Nombre completo del cliente -->
+      <div class="form-group">
+        <label for="mName">Nombre completo *</label>
+        <input type="text" id="mName" placeholder="Nombre y apellidos" />
+        <span class="error-msg" id="mErr-name">Ingresa el nombre</span>
+      </div>
+
+      <!-- Teléfono de contacto -->
+      <div class="form-group">
+        <label for="mPhone">Teléfono *</label>
+        <input type="tel" id="mPhone" placeholder="300 000 0000" />
+        <span class="error-msg" id="mErr-phone">Ingresa un teléfono válido (10 dígitos)</span>
+      </div>
+
+      <!-- Correo electrónico (opcional) -->
+      <div class="form-group">
+        <label for="mEmail">Email</label>
+        <input type="email" id="mEmail" placeholder="correo@ejemplo.com" />
+        <span class="error-msg" id="mErr-email">Ingresa un email válido</span>
+      </div>
+    </div>
+
+    <!-- Botones del modal: el comportamiento cambia según si se está creando o editando -->
+    <div class="modal-actions">
+      <!-- En modo creación: limpia los campos. En modo edición: cancela los cambios -->
+      <button class="btn btn-outline" id="modalCancelBtn" onclick="handleModalCancel()">Limpiar</button>
+      <!-- Guarda el cliente nuevo o actualiza el existente -->
+      <button class="btn btn-primary" id="modalSaveBtn"   onclick="saveCliente()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     MODAL DE CONFIRMACIÓN – ELIMINAR CLIENTE
+     Ventana emergente que pide confirmación antes de borrar
+     un cliente, para evitar eliminaciones accidentales.
+     ========================================================= -->
+<div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal modal-sm">
+
+    <!-- Cabecera con título y botón de cierre -->
+    <div class="modal-header">
+      <h2 class="modal-title" id="confirmTitle">Eliminar Cliente</h2>
+      <button class="modal-close" onclick="closeConfirm()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- Mensaje de advertencia: muestra el nombre del cliente a eliminar (se inyecta dinámicamente) -->
+    <p class="confirm-msg">¿Estás seguro de eliminar a <span class="confirm-name" id="confirmName"></span>? Esta acción no se puede deshacer.</p>
+
+    <!-- Botones: cancelar vuelve atrás, eliminar ejecuta el borrado definitivo -->
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-danger"  onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Script principal: contiene toda la lógica de la aplicación (barberos, horarios, servicios, CRUD, validaciones, etc.) -->
+<script src="app.js"></script>
+</body>
+</html>

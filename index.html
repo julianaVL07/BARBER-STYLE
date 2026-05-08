@@ -142,6 +142,51 @@
     </div>
   </form>
 </div>
+
+<!-- =========================================================
+     PANTALLA 2 – GESTIÓN DE CLIENTES (CRUD)
+     Permite buscar, agregar, editar y eliminar clientes
+     registrados en el sistema. Incluye tabla paginada.
+     ========================================================= -->
+<div class="screen" id="screen-clientes">
+
+  <!-- Encabezado de la sección de administración -->
+  <div class="section-header">
+    <div class="section-eyebrow">Administración</div>
+    <h1>Gestión de Clientes</h1>
+    <p>Administra los registros de clientes del sistema</p>
+  </div>
+
+  <!-- Barra de herramientas: búsqueda en tiempo real y botón para agregar nuevo cliente -->
+  <div class="crud-bar">
+    <!-- Campo de búsqueda: filtra la tabla mientras el usuario escribe -->
+    <input type="search" class="search-input" id="searchInput"
+           placeholder="Buscar por nombre, documento o teléfono..."
+           oninput="filterClientes()" aria-label="Buscar clientes" />
+    <!-- Botón que abre el modal para crear un nuevo cliente -->
+    <button class="btn btn-primary" onclick="openModal()">+ Nuevo Cliente</button>
+  </div>
+
+  <!-- Tabla de clientes con paginación -->
+  <div class="table-card">
+    <table role="grid" aria-label="Lista de clientes">
+      <thead>
+        <tr>
+          <th scope="col">Documento</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Teléfono</th>
+          <th scope="col">Email</th>
+          <th scope="col">Acciones</th> <!-- Columna con botones de editar y eliminar -->
+        </tr>
+      </thead>
+      <!-- Las filas de clientes se generan dinámicamente desde app.js -->
+      <tbody id="clientesTableBody"></tbody>
+    </table>
+    <!-- Controles de paginación generados dinámicamente desde app.js -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
     
 </body>
 </html>

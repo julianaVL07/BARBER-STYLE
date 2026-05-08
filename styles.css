@@ -664,3 +664,20 @@ td {
   .form-card { padding: 1.5rem; }  
 }
 
+/* ══════════════════════════════════════════════
+   ACCESIBILIDAD
+   Mejoras para usuarios que navegan con teclado
+   o que prefieren reducir el movimiento en pantalla.
+══════════════════════════════════════════════ */
+
+/* Anillo de foco visible para navegación con teclado: borde dorado */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Desactiva todas las animaciones y transiciones para usuarios que así lo configuraron
+   en sus preferencias del sistema operativo (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

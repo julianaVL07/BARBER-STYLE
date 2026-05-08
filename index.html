@@ -51,6 +51,97 @@
   <div class="toast-title" id="toastTitle"></div> <!-- Título del mensaje (ej: "Éxito") -->
   <div class="toast-msg"   id="toastMsg"></div>   <!-- Descripción del mensaje -->
 </div>
+
+
+<!-- =========================================================
+     PANTALLA 1 – AGENDAR CITA
+     Formulario principal donde el cliente llena sus datos,
+     elige barbero, horario y servicios para reservar su turno.
+     ========================================================= -->
+<div class="screen active" id="screen-citas">
+
+  <!-- Imagen decorativa de cabecera para ambientar la pantalla -->
+  <img src="header-fondo.jpg" alt="Banner de Barber Style" class="header-image" />
+
+  <!-- Encabezado de sección con título y descripción -->
+  <div class="section-header">
+    <div class="section-eyebrow">Reserva tu turno</div>
+    <h1>Agendar Cita</h1>
+    <p>Completa el formulario para reservar tu turno en Barber Style</p>
+  </div>
+
+  <!-- Formulario de agendamiento de cita (novalidate desactiva la validación nativa del navegador) -->
+  <form class="form-card" id="appointmentForm" novalidate>
+    <div class="form-grid">
+
+      <!-- Campo: Documento de identidad del cliente (solo números) -->
+      <div class="form-group">
+        <label for="clientDoc">Cédula / Tarjeta de identidad *</label>
+        <input type="text" id="clientDoc" placeholder="Ej: 1094900202" inputmode="numeric" aria-required="true" />
+        <!-- Mensaje de error que se muestra si la validación falla -->
+        <span class="error-msg" id="err-clientDoc">Ingresa un número de documento válido</span>
+      </div>
+
+      <!-- Campo: Nombre completo del cliente -->
+      <div class="form-group">
+        <label for="clientName">Nombre completo *</label>
+        <input type="text" id="clientName" placeholder="Ej: Carlos Pérez" autocomplete="name" aria-required="true" />
+        <span class="error-msg" id="err-clientName">Ingresa el nombre completo</span>
+      </div>
+
+      <!-- Campo: Teléfono de contacto (10 dígitos) -->
+      <div class="form-group">
+        <label for="clientPhone">Teléfono *</label>
+        <input type="tel" id="clientPhone" placeholder="300 000 0000" autocomplete="tel" aria-required="true" />
+        <span class="error-msg" id="err-clientPhone">Ingresa un teléfono válido (10 dígitos)</span>
+      </div>
+
+      <!-- Campo: Correo electrónico (opcional) -->
+      <div class="form-group">
+        <label for="clientEmail">Correo electrónico</label>
+        <input type="email" id="clientEmail" placeholder="correo@ejemplo.com" autocomplete="email" />
+        <span class="error-msg" id="err-clientEmail">Ingresa un correo válido</span>
+      </div>
+
+      <!-- Campo: Fecha en que el cliente desea la cita -->
+      <div class="form-group">
+        <label for="apptDate">Fecha de la cita *</label>
+        <input type="date" id="apptDate" aria-required="true" />
+        <span class="error-msg" id="err-apptDate">Selecciona una fecha válida</span>
+      </div>
+
+      <!-- Selector de barbero: los botones se generan dinámicamente desde app.js -->
+      <div class="form-group full">
+        <label>Barbero *</label>
+        <div class="barbers-grid" id="barberGrid" role="radiogroup" aria-label="Seleccionar barbero"></div>
+        <span class="error-msg" id="err-barber">Selecciona un barbero</span>
+      </div>
+
+      <!-- Selector de horario: los botones de horas disponibles se generan dinámicamente desde app.js -->
+      <div class="form-group full">
+        <label>Horario disponible *</label>
+        <div class="slots-grid" id="slotsGrid" role="radiogroup" aria-label="Seleccionar horario"></div>
+        <span class="error-msg" id="err-slot">Selecciona un horario</span>
+      </div>
+
+      <!-- Selector de servicios: casillas de verificación generadas dinámicamente desde app.js -->
+      <div class="form-group full">
+        <label>Servicios solicitados * (selecciona al menos uno)</label>
+        <div class="services-grid" id="servicesGrid" role="group" aria-label="Servicios"></div>
+        <span class="error-msg" id="err-services">Selecciona al menos un servicio</span>
+      </div>
+
+    </div>
+
+    <!-- Botones de acción del formulario -->
+    <div class="form-actions">
+      <!-- Botón para limpiar todos los campos del formulario -->
+      <button type="button" class="btn btn-outline" onclick="resetForm()">Limpiar</button>
+      <!-- Botón para enviar y confirmar la cita -->
+      <button type="submit" class="btn btn-primary">Confirmar Cita</button>
+    </div>
+  </form>
+</div>
     
 </body>
 </html>

@@ -51,3 +51,44 @@ let clientes = [
   { id: 14, documento: '1094900014', nombre: 'Cristian Camilo Duque',    telefono: '3197778889', email: 'cristian@email.com' },
   { id: 15, documento: '1094900015', nombre: 'Jonatan Estiven Ramos',    telefono: '3029990001', email: 'jonatan@mail.com'   },
 ];
+
+/* ── ESTADO GLOBAL DE LA APLICACIÓN ──
+   Variables que guardan la selección actual del usuario en el formulario
+   y controlan el comportamiento de la tabla y los modales. */
+let selectedBarbero  = null;       // ID del barbero seleccionado en el formulario
+let selectedSlot     = null;       // Horario seleccionado (ej: '10:00')
+let selectedServices = new Set();  // Conjunto de IDs de servicios marcados (evita duplicados)
+let editingId        = null;       // ID del cliente que se está editando en el modal (null si es nuevo)
+let deletingId       = null;       // ID del cliente que se va a eliminar en el modal de confirmación
+let currentPage      = 1;          // Página actualmente visible en la tabla de clientes
+const PAGE_SIZE      = 8;          // Cantidad de clientes mostrados por página
+let filteredClientes = [...clientes]; // Copia del arreglo de clientes que se actualiza al buscar
+let nextId           = 16;         // Contador para asignar IDs únicos a nuevos clientes localmente
+
+/* ══════════════════════════════════════════════
+   NAVEGACIÓN
+   Controla qué pantalla se muestra y cuál pestaña
+   aparece como activa en la barra de navegación.
+══════════════════════════════════════════════ */
+function showScreen(name) {
+  // Ocultar todas las pantallas quitando la clase "active"
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+  // Desactivar todas las pestañas de navegación
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+
+  // Mostrar solo la pantalla correspondiente al nombre recibido
+  document.getElementById('screen-' + name).classList.add('active');
+
+  // Marcar como activa la pestaña correcta: índice 0 = citas, 1 = clientes
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx  = name === 'citas' ? 0 : 1;
+  tabs[idx].classList.add('active');
+  tabs[idx].setAttribute('aria-selected', 'true');
+
+  // Si se navega a clientes, cargar y renderizar la tabla
+  if (name === 'clientes') renderClientes();
+}

@@ -92,3 +92,249 @@ function showScreen(name) {
   // Si se navega a clientes, cargar y renderizar la tabla
   if (name === 'clientes') renderClientes();
 }
+
+/* ══════════════════════════════════════════════
+   INIT – FORMULARIO DE CITA
+   Inicializa el formulario al cargar la página:
+   establece la fecha mínima, dibuja las tarjetas
+   de barberos, los checkboxes de servicios y los horarios.
+══════════════════════════════════════════════ */
+function initForm() {
+  // Establecer la fecha de hoy como valor y mínimo del campo de fecha (no se pueden agendar citas en el pasado)
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('apptDate').min   = today;
+  document.getElementById('apptDate').value = today;
+
+  // Generar dinámicamente las tarjetas de barbero a partir del arreglo BARBEROS
+  const grid = document.getElementById('barberGrid');
+  grid.innerHTML = BARBEROS.map(b => `
+    <div class="barber-card" id="bc-${b.id}" onclick="selectBarbero(${b.id})"
+         role="radio" aria-checked="false" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' ') selectBarbero(${b.id})">
+      <div class="barber-avatar" style="background:${b.color}">${b.inicial}</div>
+      <div class="barber-name">${b.nombre}</div>
+      <div class="barber-spec">${b.especialidad}</div>
+    </div>
+  `).join('');
+
+  // Generar dinámicamente los checkboxes de servicios a partir del arreglo SERVICIOS
+  const sg = document.getElementById('servicesGrid');
+  sg.innerHTML = SERVICIOS.map(s => `
+    <label class="service-check" id="sc-${s.id}">
+      <input type="checkbox" value="${s.id}" onchange="toggleService(${s.id}, this)" />
+      <span>${s.nombre}</span>
+    </label>
+  `).join('');
+
+  // Renderizar la grilla de horarios disponibles
+  renderSlots();
+}
+
+/* ── SELECCIÓN DE BARBERO ──
+   Marca visualmente la tarjeta del barbero elegido y
+   actualiza los horarios disponibles según sus ocupados. */
+function selectBarbero(id) {
+  selectedBarbero = id;
+
+  // Quitar la selección visual de todas las tarjetas
+  document.querySelectorAll('.barber-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-checked', 'false');
+  });
+
+  // Marcar como seleccionada la tarjeta del barbero elegido
+  const card = document.getElementById('bc-' + id);
+  card.classList.add('selected');
+  card.setAttribute('aria-checked', 'true');
+
+  // Limpiar el error de validación del campo barbero
+  clearErr('barber');
+
+  // Volver a renderizar los horarios para reflejar los ocupados del barbero seleccionado
+  renderSlots();
+}
+
+/* ── RENDERIZADO DE HORARIOS ──
+   Dibuja los botones de horario marcando cuáles están ocupados
+   para el barbero seleccionado y cuál está actualmente elegido. */
+function renderSlots() {
+  // Obtener los horarios ocupados del barbero seleccionado (o vacío si no hay barbero)
+  const barbero = BARBEROS.find(b => b.id === selectedBarbero);
+  const booked  = selectedBarbero ? (barbero.ocupados || []) : [];
+  const grid    = document.getElementById('slotsGrid');
+
+  // Crear un botón por cada horario, aplicando clases según si está ocupado o seleccionado
+  grid.innerHTML = HORARIOS.map(h => {
+    const taken = booked.includes(h);   // true si ese horario ya está reservado
+    const sel   = h === selectedSlot;   // true si el usuario ya lo eligió
+    return `<button type="button"
+      class="slot${taken ? ' taken' : ''}${sel ? ' selected' : ''}"
+      onclick="${taken ? '' : `selectSlot('${h}')`}"
+      aria-label="Horario ${h}${taken ? ' - no disponible' : ''}"
+      aria-disabled="${taken}"
+    >${h}${taken ? ' ✗' : ''}</button>`;
+  }).join('');
+}
+
+/* Al cambiar la fecha de la cita, se reinicia el horario seleccionado
+   y se vuelven a dibujar los slots para reflejar el nuevo día */
+document.getElementById('apptDate').addEventListener('change', () => {
+  selectedSlot = null;
+  renderSlots();
+});
+
+/* ── SELECCIÓN DE HORARIO ──
+   Guarda el horario elegido y refresca la grilla para marcarlo visualmente. */
+function selectSlot(h) {
+  selectedSlot = h;
+  clearErr('slot');
+  renderSlots();
+}
+
+/* ── SELECCIÓN DE SERVICIOS ──
+   Añade o elimina un servicio del Set de seleccionados
+   y aplica/quita el estilo visual de la etiqueta. */
+function toggleService(id, cb) {
+  const label = document.getElementById('sc-' + id);
+  if (cb.checked) { selectedServices.add(id); label.classList.add('selected'); }
+  else            { selectedServices.delete(id); label.classList.remove('selected'); }
+
+  // Si hay al menos un servicio seleccionado, quitar el mensaje de error
+  if (selectedServices.size > 0) clearErr('services');
+}
+
+/* ══════════════════════════════════════════════
+   VALIDACIÓN DE CAMPOS
+   Funciones para mostrar y ocultar mensajes de error
+   en los campos del formulario de agendar cita.
+══════════════════════════════════════════════ */
+
+/* Muestra el mensaje de error de un campo y le aplica el estilo de error al input */
+function setErr(field) {
+  const el  = document.getElementById('err-' + field);
+  // Mapa que relaciona el nombre del campo con el ID de su input en el DOM
+  const map = { clientDoc:'clientDoc', clientName:'clientName', clientPhone:'clientPhone', clientEmail:'clientEmail', apptDate:'apptDate' };
+  if (el) el.classList.add('visible');
+  if (map[field]) document.getElementById(map[field])?.classList.add('error');
+}
+
+/* Oculta el mensaje de error de un campo y le quita el estilo de error al input */
+function clearErr(field) {
+  const el  = document.getElementById('err-' + field);
+  const map = { clientDoc:'clientDoc', clientName:'clientName', clientPhone:'clientPhone', clientEmail:'clientEmail', apptDate:'apptDate' };
+  if (el) el.classList.remove('visible');
+  if (map[field]) document.getElementById(map[field])?.classList.remove('error');
+}
+
+/* ══════════════════════════════════════════════
+   SUBMIT – AGENDAR CITA
+   Intercepta el envío del formulario, valida todos los campos,
+   envía los datos al backend y actualiza el estado local.
+══════════════════════════════════════════════ */
+document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+  e.preventDefault(); // Evitar el comportamiento nativo de recarga de página
+  let valid = true;
+
+  // Leer y limpiar los valores de cada campo del formulario
+  const doc   = document.getElementById('clientDoc').value.trim();
+  const name  = document.getElementById('clientName').value.trim();
+  const phone = document.getElementById('clientPhone').value.trim().replace(/\s/g, ''); // quitar espacios del teléfono
+  const email = document.getElementById('clientEmail').value.trim();
+  const date  = document.getElementById('apptDate').value;
+
+  // Limpiar todos los errores antes de validar de nuevo
+  ['clientDoc','clientName','clientPhone','clientEmail','apptDate','barber','slot','services'].forEach(clearErr);
+
+  // Validaciones de cada campo: si falla, se muestra el error y se marca el formulario como inválido
+  if (!doc   || doc.length < 5)                                      { setErr('clientDoc');   valid = false; } // Documento mínimo 5 caracteres
+  if (!name  || name.length < 3)                                     { setErr('clientName');  valid = false; } // Nombre mínimo 3 caracteres
+  if (!/^\d{10}$/.test(phone))                                       { setErr('clientPhone'); valid = false; } // Teléfono exactamente 10 dígitos
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))           { setErr('clientEmail'); valid = false; } // Email válido si se ingresó
+  if (!date)                                                          { setErr('apptDate');    valid = false; } // Fecha obligatoria
+  if (!selectedBarbero)                                               { setErr('barber');      valid = false; } // Barbero obligatorio
+  if (!selectedSlot)                                                  { setErr('slot');        valid = false; } // Horario obligatorio
+  if (selectedServices.size === 0)                                    { setErr('services');    valid = false; } // Al menos un servicio
+  if (!valid) return; // Si hay errores, no continuar con el envío
+
+  // Deshabilitar el botón y mostrar spinner mientras se procesa
+  const submitBtn = e.submitter || document.querySelector('#appointmentForm [type=submit]');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span> Guardando…';
+
+  try {
+    // Construir el objeto con los datos de la cita para enviar al backend
+    const payload = {
+      documento:   doc,
+      nombre:      name,
+      telefono:    phone,
+      email:       email || '',
+      barberoId:   selectedBarbero,
+      servicioIds: Array.from(selectedServices), // Convertir Set a array para JSON
+      fecha:       date,
+      hora:        selectedSlot
+    };
+    // Enviar la cita al backend vía POST (si falla, el catch lo maneja silenciosamente)
+    await fetch(`${API}/citas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(_) { /* Si el backend no está disponible, se continúa con el flujo local */ }
+
+  // Bloquear el horario localmente para que no se pueda volver a seleccionar en la misma sesión
+  const b = BARBEROS.find(x => x.id === selectedBarbero);
+  if (!b.ocupados.includes(selectedSlot)) b.ocupados.push(selectedSlot);
+
+  // Si el cliente no existe aún en la lista local, agregarlo
+  const existe = clientes.find(c => c.documento === doc || c.telefono === phone);
+  if (!existe) {
+    clientes.push({ id: nextId++, documento: doc, nombre: name, telefono: phone, email: email || '' });
+    filteredClientes = [...clientes];
+  }
+
+  // Construir el resumen de servicios seleccionados para mostrar en el toast
+  const sNames = Array.from(selectedServices)
+    .map(id => SERVICIOS.find(s => s.id === id).nombre)
+    .join(', ');
+
+  // Mostrar notificación de éxito con el resumen de la cita
+  showToast('Cita confirmada', `${name} · ${b.nombre} · ${date} ${selectedSlot} · ${sNames}`);
+
+  // Limpiar el formulario para una nueva cita
+  resetForm();
+
+  // Reactivar el botón de envío
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = 'Confirmar Cita';
+});
+
+/* ── LIMPIAR FORMULARIO ──
+   Reinicia todos los campos, selecciones y estados visuales del formulario
+   dejándolo listo para agendar una nueva cita. */
+function resetForm() {
+  document.getElementById('appointmentForm').reset(); // Limpiar todos los inputs nativos
+
+  // Reiniciar estado de selecciones
+  selectedBarbero = null; selectedSlot = null; selectedServices.clear();
+
+  // Quitar estilos de selección de barberos
+  document.querySelectorAll('.barber-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-checked', 'false');
+  });
+
+  // Quitar estilos de selección de servicios
+  document.querySelectorAll('.service-check').forEach(c => c.classList.remove('selected'));
+
+  // Ocultar todos los mensajes de error
+  document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('visible'));
+
+  // Quitar estilos de error de los inputs
+  document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+
+  // Restablecer la fecha al día de hoy
+  document.getElementById('apptDate').value = new Date().toISOString().split('T')[0];
+
+  // Volver a renderizar los horarios (sin selección y sin barbero)
+  renderSlots();
+}

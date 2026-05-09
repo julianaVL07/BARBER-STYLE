@@ -591,3 +591,60 @@ async function saveCliente() {
   closeModal();
   saveBtn.disabled = false;
 }
+
+/* ══════════════════════════════════════════════
+   CONFIRMACIÓN DE ELIMINACIÓN
+   Abre el modal de confirmación antes de borrar un cliente,
+   mostrando su nombre para que el usuario confirme la acción.
+══════════════════════════════════════════════ */
+
+/* ── ABRIR MODAL DE CONFIRMACIÓN ──
+   Guarda el ID del cliente a eliminar y muestra su nombre en el mensaje. */
+function openConfirm(id) {
+  deletingId = id;
+  const c = clientes.find(x => x.id === id);
+  document.getElementById('confirmName').textContent = c.nombre;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+/* ── CERRAR MODAL DE CONFIRMACIÓN ──
+   Cierra el modal y reinicia el ID de eliminación. */
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('open');
+  deletingId = null;
+}
+
+/* ── CONFIRMAR ELIMINACIÓN ──
+   Elimina el cliente del backend y del arreglo local,
+   luego refresca la tabla y ajusta la página si es necesario. */
+async function confirmDelete() {
+  const c = clientes.find(x => x.id === deletingId);
+  try {
+    // Enviar petición DELETE al backend
+    await fetch(`${API}/clientes/${deletingId}`, { method: 'DELETE' });
+  } catch(_) { /* Si el backend no responde, continuar con el borrado local */ }
+
+  // Eliminar el cliente del arreglo local y sincronizar la lista filtrada
+  clientes = clientes.filter(x => x.id !== deletingId);
+  filteredClientes = [...clientes];
+
+  showToast('Cliente eliminado', c.nombre);
+  closeConfirm();
+
+  // Si la página actual quedó vacía tras la eliminación, retroceder una página
+  if ((currentPage - 1) * PAGE_SIZE >= filteredClientes.length && currentPage > 1) currentPage--;
+  renderTable();
+}
+
+/* ── CERRAR MODALES CON CLICK FUERA O TECLA ESC ──
+   Mejora la experiencia del usuario permitiendo cerrar los modales
+   de forma rápida sin necesidad de usar los botones. */
+document.getElementById('clientModal').addEventListener('click',  function(e) { if (e.target === this) closeModal(); });
+document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+});
+
+/* ── BOOT ──
+   Punto de entrada de la aplicación: inicializa el formulario al cargar la página. */
+initForm();

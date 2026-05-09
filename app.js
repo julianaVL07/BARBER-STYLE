@@ -416,3 +416,178 @@ function renderTable() {
 
   renderPagination(); // Actualizar los controles de paginación debajo de la tabla
 }
+
+/* ── RENDERIZAR PAGINACIÓN ──
+   Genera los botones de página y el texto "Mostrando X–Y de Z" debajo de la tabla. */
+function renderPagination() {
+  const total = filteredClientes.length;
+  const pages = Math.ceil(total / PAGE_SIZE);             // Total de páginas necesarias
+  const start = (currentPage - 1) * PAGE_SIZE + 1;       // Número del primer registro visible
+  const end   = Math.min(currentPage * PAGE_SIZE, total); // Número del último registro visible
+
+  // Construir el HTML de la barra de paginación
+  let html = `<span>Mostrando ${start}–${end} de ${total}</span><div class="page-btns">`;
+  html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`;
+
+  // Generar un botón por cada página
+  for (let i = 1; i <= pages; i++) {
+    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>Next ›</button>`;
+  html += '</div>';
+  document.getElementById('pagination').innerHTML = html;
+}
+
+/* ── IR A UNA PÁGINA ──
+   Cambia la página activa de la tabla si el número es válido. */
+function goPage(p) {
+  const pages = Math.ceil(filteredClientes.length / PAGE_SIZE);
+  if (p < 1 || p > pages) return; // Ignorar si está fuera del rango válido
+  currentPage = p;
+  renderTable();
+}
+
+/* ══════════════════════════════════════════════
+   MODAL CREAR / EDITAR CLIENTE
+   Abre el modal para registrar un nuevo cliente o
+   para modificar los datos de uno existente.
+══════════════════════════════════════════════ */
+
+/* ── ABRIR MODAL ──
+   Si se pasa un ID, el modal se abre en modo edición con los datos del cliente.
+   Si no se pasa ID, se abre en modo creación con los campos vacíos. */
+function openModal(id) {
+  editingId = id || null;
+  clearModalErrors();
+
+  const cancelBtn = document.getElementById('modalCancelBtn');
+  const saveBtn   = document.getElementById('modalSaveBtn');
+
+  if (id) {
+    // Modo edición: cargar los datos del cliente en los campos del modal
+    const c = clientes.find(x => x.id === id);
+    document.getElementById('modalTitle').textContent = 'Editar Cliente';
+    document.getElementById('mDoc').value   = c.documento;
+    document.getElementById('mName').value  = c.nombre;
+    document.getElementById('mPhone').value = c.telefono;
+    document.getElementById('mEmail').value = c.email || '';
+    cancelBtn.textContent = 'Cancelar'; // En edición, cancelar cierra el modal
+    saveBtn.textContent   = 'Guardar';
+  } else {
+    // Modo creación: limpiar los campos y mostrar textos de nuevo cliente
+    document.getElementById('modalTitle').textContent = 'Nuevo Cliente';
+    clearModalFields();
+    cancelBtn.textContent = 'Limpiar'; // En creación, "cancelar" solo limpia los campos
+    saveBtn.textContent   = 'Agregar';
+  }
+
+  // Mostrar el modal y enfocar el primer campo
+  document.getElementById('clientModal').classList.add('open');
+  document.getElementById('mDoc').focus();
+}
+
+/* ── MANEJAR BOTÓN CANCELAR DEL MODAL ──
+   En modo edición: cierra el modal.
+   En modo creación: solo limpia los campos sin cerrar. */
+function handleModalCancel() {
+  if (editingId) {
+    closeModal();
+  } else {
+    clearModalFields();
+    clearModalErrors();
+  }
+}
+
+/* ── LIMPIAR CAMPOS DEL MODAL ──
+   Vacía todos los inputs del formulario del modal. */
+function clearModalFields() {
+  ['mDoc','mName','mPhone','mEmail'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+/* ── LIMPIAR ERRORES DEL MODAL ──
+   Oculta todos los mensajes de error del formulario del modal. */
+function clearModalErrors() {
+  ['doc','name','phone','email'].forEach(f => {
+    document.getElementById('mErr-' + f)?.classList.remove('visible');
+  });
+}
+
+/* ── CERRAR MODAL ──
+   Cierra el modal y reinicia el ID de edición. */
+function closeModal() {
+  document.getElementById('clientModal').classList.remove('open');
+  editingId = null;
+}
+
+/* ── GUARDAR CLIENTE ──
+   Valida los campos del modal y luego crea o actualiza el cliente
+   tanto en el backend (si está disponible) como en el arreglo local. */
+async function saveCliente() {
+  const doc   = document.getElementById('mDoc').value.trim();
+  const name  = document.getElementById('mName').value.trim();
+  const phone = document.getElementById('mPhone').value.trim().replace(/\s/g, '');
+  const email = document.getElementById('mEmail').value.trim();
+  let valid   = true;
+
+  clearModalErrors();
+
+  // Validar cada campo del modal
+  if (!doc   || doc.length < 5)                                    { document.getElementById('mErr-doc').classList.add('visible');   valid = false; }
+  if (!name  || name.length < 3)                                   { document.getElementById('mErr-name').classList.add('visible');  valid = false; }
+  if (!/^\d{10}$/.test(phone))                                     { document.getElementById('mErr-phone').classList.add('visible'); valid = false; }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))         { document.getElementById('mErr-email').classList.add('visible'); valid = false; }
+  if (!valid) return; // No continuar si hay errores
+
+  // Deshabilitar el botón mientras se procesa para evitar doble clic
+  const saveBtn = document.getElementById('modalSaveBtn');
+  saveBtn.disabled = true;
+
+  try {
+    if (editingId) {
+      // Modo edición: enviar PUT al backend con los nuevos datos
+      await fetch(`${API}/clientes/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documento: doc, nombre: name, telefono: phone, email })
+      });
+      // Actualizar el cliente en el arreglo local
+      const c = clientes.find(x => x.id === editingId);
+      c.documento = doc; c.nombre = name; c.telefono = phone; c.email = email;
+      showToast('Cliente actualizado', name);
+    } else {
+      // Modo creación: enviar POST al backend
+      const res = await fetch(`${API}/clientes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documento: doc, nombre: name, telefono: phone, email })
+      }).catch(() => null); // Si falla la petición, devuelve null en lugar de lanzar error
+
+      // Usar el ID devuelto por el backend, o generar uno local si no está disponible
+      let newId = nextId++;
+      if (res && res.ok) {
+        const created = await res.json().catch(() => null);
+        if (created?.id) newId = created.id;
+      }
+      clientes.push({ id: newId, documento: doc, nombre: name, telefono: phone, email: email || '' });
+      showToast('Cliente creado', name);
+    }
+  } catch(_) {
+    // Si el backend no responde, realizar la operación solo en el arreglo local
+    if (editingId) {
+      const c = clientes.find(x => x.id === editingId);
+      c.documento = doc; c.nombre = name; c.telefono = phone; c.email = email;
+    } else {
+      clientes.push({ id: nextId++, documento: doc, nombre: name, telefono: phone, email: email || '' });
+    }
+    showToast(editingId ? 'Cliente actualizado' : 'Cliente creado', name);
+  }
+
+  // Sincronizar la lista filtrada, refrescar la tabla, cerrar el modal y reactivar el botón
+  filteredClientes = [...clientes];
+  renderTable();
+  closeModal();
+  saveBtn.disabled = false;
+}

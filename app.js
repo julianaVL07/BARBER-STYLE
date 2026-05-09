@@ -338,3 +338,81 @@ function resetForm() {
   // Volver a renderizar los horarios (sin selección y sin barbero)
   renderSlots();
 }
+
+/* ══════════════════════════════════════════════
+   TOAST (NOTIFICACIÓN EMERGENTE)
+   Muestra un mensaje temporal en la esquina superior derecha.
+   Desaparece automáticamente después de 4 segundos.
+══════════════════════════════════════════════ */
+function showToast(title, msg, isError = false) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent   = msg;
+  t.classList.toggle('error', isError); // Si isError es true, aplica el estilo rojo
+  t.classList.add('show');              // Hacer visible el toast
+  setTimeout(() => t.classList.remove('show'), 4000); // Ocultarlo después de 4 segundos
+}
+
+/* ══════════════════════════════════════════════
+   CRUD CLIENTES
+   Funciones para buscar, listar, paginar,
+   crear, editar y eliminar clientes.
+══════════════════════════════════════════════ */
+
+/* ── FILTRAR CLIENTES ──
+   Se ejecuta en tiempo real al escribir en el buscador.
+   Filtra por nombre, documento, teléfono o email. */
+function filterClientes() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  filteredClientes = clientes.filter(c =>
+    c.nombre.toLowerCase().includes(q)  ||
+    c.documento.includes(q)             ||
+    c.telefono.includes(q)              ||
+    (c.email || '').toLowerCase().includes(q)
+  );
+  currentPage = 1; // Volver a la primera página al filtrar
+  renderTable();
+}
+
+/* ── CARGAR CLIENTES ──
+   Reinicia la lista filtrada con todos los clientes y renderiza la tabla desde la página 1. */
+function renderClientes() {
+  filteredClientes = [...clientes];
+  currentPage = 1;
+  renderTable();
+}
+
+/* ── RENDERIZAR TABLA ──
+   Dibuja las filas de la página actual en el cuerpo de la tabla
+   y actualiza los controles de paginación. */
+function renderTable() {
+  // Calcular el rango de clientes de la página actual
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page  = filteredClientes.slice(start, start + PAGE_SIZE);
+  const tbody = document.getElementById('clientesTableBody');
+
+  // Si no hay resultados, mostrar un mensaje centrado en lugar de filas
+  if (page.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2.5rem">Sin resultados</td></tr>`;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  // Generar el HTML de cada fila con los datos del cliente y sus botones de acción
+  tbody.innerHTML = page.map(c => `
+    <tr>
+      <td class="td-doc">${c.documento}</td>
+      <td class="td-name">${c.nombre}</td>
+      <td>${c.telefono}</td>
+      <td class="td-email">${c.email || '—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-outline btn-sm" onclick="openModal(${c.id})" aria-label="Editar ${c.nombre}">✎ Editar</button>
+          <button class="btn btn-danger  btn-sm" onclick="openConfirm(${c.id})" aria-label="Eliminar ${c.nombre}">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  renderPagination(); // Actualizar los controles de paginación debajo de la tabla
+}

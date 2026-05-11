@@ -35,21 +35,21 @@ const SERVICIOS = [
    Arreglo inicial de clientes para poblar la tabla mientras no hay backend activo.
    En producción, estos datos vendrían de la API. */
 let clientes = [
-  { id:  1, documento: '1094900001', nombre: 'Carlos Alberto Pérez',    telefono: '3001234567', email: 'carlos@email.com'   },
-  { id:  2, documento: '1094900002', nombre: 'Juan Esteban López',       telefono: '3109876543', email: 'juan@email.com'     },
-  { id:  3, documento: '1094900003', nombre: 'Miguel Ángel Torres',      telefono: '3157654321', email: 'miguel@email.com'   },
-  { id:  4, documento: '1094900004', nombre: 'Sebastián Díaz Gómez',     telefono: '3204561237', email: 'sebastian@mail.com' },
-  { id:  5, documento: '1094900005', nombre: 'Andrés Felipe Ruiz',       telefono: '3002345678', email: 'andres@mail.com'    },
-  { id:  6, documento: '1094900006', nombre: 'Diego Alejandro Moreno',   telefono: '3118765432', email: 'diego@email.com'    },
-  { id:  7, documento: '1094900007', nombre: 'Julián David Vargas',      telefono: '3163456789', email: 'julian@email.com'   },
-  { id:  8, documento: '1094900008', nombre: 'Camilo Ernesto Sánchez',   telefono: '3055678901', email: 'camilo@email.com'   },
-  { id:  9, documento: '1094900009', nombre: 'Nicolás Herrera Castillo', telefono: '3177890123', email: 'nicolas@mail.com'   },
-  { id: 10, documento: '1094900010', nombre: 'Felipe Andrés Ospina',     telefono: '3209012345', email: 'felipe@email.com'   },
-  { id: 11, documento: '1094900011', nombre: 'Santiago Cárdenas Ríos',   telefono: '3001112223', email: 'santiago@mail.com'  },
-  { id: 12, documento: '1094900012', nombre: 'David Mauricio Palomino',  telefono: '3133334445', email: 'david@email.com'    },
-  { id: 13, documento: '1094900013', nombre: 'Steven Alexander Molina',  telefono: '3165556667', email: 'steven@mail.com'    },
-  { id: 14, documento: '1094900014', nombre: 'Cristian Camilo Duque',    telefono: '3197778889', email: 'cristian@email.com' },
-  { id: 15, documento: '1094900015', nombre: 'Jonatan Estiven Ramos',    telefono: '3029990001', email: 'jonatan@mail.com'   },
+  { id:  1, documento: '1094900001', nombre: 'Carlos Alberto Pérez',    telefono: '3001234567', email: 'carlos@gmail.com'   },
+  { id:  2, documento: '1094900002', nombre: 'Juan Esteban López',       telefono: '3109876543', email: 'juan@gmail.com'     },
+  { id:  3, documento: '1094900003', nombre: 'Miguel Ángel Torres',      telefono: '3157654321', email: 'miguel@gmail.com'   },
+  { id:  4, documento: '1094900004', nombre: 'Sebastián Díaz Gómez',     telefono: '3204561237', email: 'sebastian@gmail.com' },
+  { id:  5, documento: '1094900005', nombre: 'Andrés Felipe Ruiz',       telefono: '3002345678', email: 'andres@gmail.com'    },
+  { id:  6, documento: '1094900006', nombre: 'Diego Alejandro Moreno',   telefono: '3118765432', email: 'diego@gmail.com'    },
+  { id:  7, documento: '1094900007', nombre: 'Julián David Vargas',      telefono: '3163456789', email: 'julian@gmail.com'   },
+  { id:  8, documento: '1094900008', nombre: 'Camilo Ernesto Sánchez',   telefono: '3055678901', email: 'camilo@gmail.com'   },
+  { id:  9, documento: '1094900009', nombre: 'Nicolás Herrera Castillo', telefono: '3177890123', email: 'nicolas@gmail.com'   },
+  { id: 10, documento: '1094900010', nombre: 'Felipe Andrés Ospina',     telefono: '3209012345', email: 'felipe@gmail.com'   },
+  { id: 11, documento: '1094900011', nombre: 'Santiago Cárdenas Ríos',   telefono: '3001112223', email: 'santiago@gmail.com'  },
+  { id: 12, documento: '1094900012', nombre: 'David Mauricio Palomino',  telefono: '3133334445', email: 'david@gmail.com'    },
+  { id: 13, documento: '1094900013', nombre: 'Steven Alexander Molina',  telefono: '3165556667', email: 'steven@gmail.com'    },
+  { id: 14, documento: '1094900014', nombre: 'Cristian Camilo Duque',    telefono: '3197778889', email: 'cristian@gmail.com' },
+  { id: 15, documento: '1094900015', nombre: 'Jonatan Estiven Ramos',    telefono: '3029990001', email: 'jonatan@gmail.com'   },
 ];
 
 /* ── ESTADO GLOBAL DE LA APLICACIÓN ──
@@ -163,10 +163,30 @@ function renderSlots() {
   const booked  = selectedBarbero ? (barbero.ocupados || []) : [];
   const grid    = document.getElementById('slotsGrid');
 
-  // Crear un botón por cada horario, aplicando clases según si está ocupado o seleccionado
+  // Obtener fecha actual y hora actual
+  const today = new Date().toISOString().split('T')[0];
+  const selectedDate = document.getElementById('apptDate').value;
+
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  // Crear un botón por cada horario, aplicando clases según si está ocupado,
+  // si ya pasó la hora actual o si está seleccionado
   grid.innerHTML = HORARIOS.map(h => {
-    const taken = booked.includes(h);   // true si ese horario ya está reservado
-    const sel   = h === selectedSlot;   // true si el usuario ya lo eligió
+
+    // Obtener solo la hora del slot (ej: "14:00" → 14)
+    const slotHour = parseInt(h.split(':')[0]);
+
+    // Verificar si el horario ya pasó para el día actual
+    const pastHour =
+      selectedDate === today && slotHour <= currentHour;
+
+    // El horario queda bloqueado si ya está ocupado o ya pasó
+    const taken = booked.includes(h) || pastHour;
+
+    // Verificar si está seleccionado
+    const sel = h === selectedSlot;
+
     return `<button type="button"
       class="slot${taken ? ' taken' : ''}${sel ? ' selected' : ''}"
       onclick="${taken ? '' : `selectSlot('${h}')`}"
